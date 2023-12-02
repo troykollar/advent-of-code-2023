@@ -13,41 +13,91 @@ func Day1() {
 
 	splitInput := strings.Split(input, "\n")
 	sum := 0
-	for i, line := range splitInput {
+	for _, line := range splitInput {
 		calibrationValue := getCalibrationValue(line)
-		fmt.Println(fmt.Sprintf("Line %v calibration value: %v", i, calibrationValue))
+		// fmt.Println(fmt.Sprintf("Line %v, Calibration Value: %v", i, calibrationValue))
 
-		sum += getCalibrationValue(line)
+		sum += calibrationValue
 	}
 	fmt.Printf("Sum: %v", sum)
 }
 
 func getCalibrationValue(line string) int {
-	digits := make([]rune, 0)
-
-	for _, character := range line {
-		if unicode.IsDigit(character) {
-			digits = append(digits, character)
-		}
-	}
+	digits := getDigits(line)
 
 	if len(digits) == 0 {
 		return 0
 	}
 
-	if len(digits) == 1 {
-		digits = append(digits, digits[0])
-	}
-
 	firstDigit := digits[0]
-	lastDigit := digits[len(digits)-1]
-	calibrationValueString := string([]rune{firstDigit, lastDigit})
+	lastDigit := digits[0]
 
-	calibrationValue, err := strconv.Atoi(calibrationValueString)
+	for _, digit := range digits {
+		if digit.Index < firstDigit.Index {
+			firstDigit = digit
+		}
 
-	if err != nil {
-		panic(fmt.Sprintf("Non-numeric digit entered. Error: %v", err))
+		if digit.Index > lastDigit.Index {
+			lastDigit = digit
+		}
 	}
 
+	calibrationValue, _ := strconv.Atoi(firstDigit.Digit + lastDigit.Digit)
 	return calibrationValue
+}
+
+func getDigits(line string) []Digit {
+	digits := make([]Digit, 0)
+	digits = append(digits, getNumericDigits(line)...)
+	digits = append(digits, getTextDigits(line)...)
+	return digits
+}
+
+func getNumericDigits(line string) []Digit {
+	digits := make([]Digit, 0)
+	for i, char := range line {
+		if unicode.IsDigit(char) {
+			digits = append(digits, Digit{Digit: string(char), Index: i})
+		}
+	}
+	return digits
+}
+
+func getTextDigits(line string) []Digit {
+	digitsAsText := []DigitAsText{
+		{Text: "one", Digit: "1"},
+		{Text: "two", Digit: "2"},
+		{Text: "three", Digit: "3"},
+		{Text: "four", Digit: "4"},
+		{Text: "five", Digit: "5"},
+		{Text: "six", Digit: "6"},
+		{Text: "seven", Digit: "7"},
+		{Text: "eight", Digit: "8"},
+		{Text: "nine", Digit: "9"},
+	}
+
+	textDigits := make([]Digit, 0)
+	for _, textDigit := range digitsAsText {
+		firstIndex := strings.Index(line, textDigit.Text)
+		if firstIndex != -1 {
+			textDigits = append(textDigits, Digit{Digit: textDigit.Digit, Index: firstIndex})
+		}
+
+		lastIndex := strings.LastIndex(line, textDigit.Text)
+		if lastIndex != -1 {
+			textDigits = append(textDigits, Digit{Digit: textDigit.Digit, Index: lastIndex})
+		}
+	}
+
+	return textDigits
+}
+
+type DigitAsText struct {
+	Text  string
+	Digit string
+}
+
+type Digit struct {
+	Digit string
+	Index int
 }
