@@ -18,31 +18,63 @@ func Day3() {
 	}
 
 	sum := 0
+	gearRatioSum := 0
 
 	for i, line := range lines {
 		prevLine := Line{Numbers: make([]Number, 0), Symbols: make([]Symbol, 0)}
 		nextLine := Line{Numbers: make([]Number, 0), Symbols: make([]Symbol, 0)}
-
 		if i != 0 {
 			prevLine = lines[i-1]
 		}
-
 		if i != len(lines)-1 {
 			nextLine = lines[i+1]
 		}
 
 		partNumbers := getPartNumbersInLine(line, prevLine, nextLine)
-
 		lineSum := 0
 		for _, partNumber := range partNumbers {
 			lineSum += partNumber
 		}
-
 		sum += lineSum
-		fmt.Printf("%v, Line Sum: %v, Total Sum: %v\n", partNumbers, lineSum, sum)
+
+		for _, symbol := range line.Symbols {
+			gearRatioSum += getGearRatio(symbol, line, prevLine, nextLine)
+		}
 	}
 
-	fmt.Println(fmt.Sprintf("Sum: %v", sum))
+	fmt.Println(fmt.Sprintf("Sum: %v, Gear Ratio Sum: %v", sum, gearRatioSum))
+}
+
+func getGearRatio(symbol Symbol, line Line, prevLine Line, nextLine Line) int {
+	if symbol.Symbol != '*' {
+		return 0
+	}
+
+	adjacentNumbers := make([]int, 0)
+
+	for _, number := range line.Numbers {
+		if symbol.Index >= number.IndexStart-1 && symbol.Index <= number.IndexEnd+1 {
+			adjacentNumbers = append(adjacentNumbers, number.Number)
+		}
+	}
+
+	for _, number := range prevLine.Numbers {
+		if symbol.Index >= number.IndexStart-1 && symbol.Index <= number.IndexEnd+1 {
+			adjacentNumbers = append(adjacentNumbers, number.Number)
+		}
+	}
+
+	for _, number := range nextLine.Numbers {
+		if symbol.Index >= number.IndexStart-1 && symbol.Index <= number.IndexEnd+1 {
+			adjacentNumbers = append(adjacentNumbers, number.Number)
+		}
+	}
+
+	if len(adjacentNumbers) != 2 {
+		return 0
+	}
+
+	return adjacentNumbers[0] * adjacentNumbers[1]
 }
 
 func getPartNumbersInLine(line Line, prevLine Line, nextLine Line) []int {
