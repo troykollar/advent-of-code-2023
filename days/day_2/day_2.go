@@ -17,6 +17,7 @@ func Day2() {
 	lines := strings.Split(input, "\n")
 
 	sum := 0
+	powerSums := 0
 	for _, line := range lines {
 		fmt.Println(line)
 		game, err := parseLine(line)
@@ -29,9 +30,10 @@ func Day2() {
 			log = fmt.Sprintf("Game %v possible.", game.Id)
 			sum += game.Id
 		}
+		powerSums += game.power()
 		fmt.Println(log)
 	}
-	fmt.Println(fmt.Sprintf("Sum = %v", sum))
+	fmt.Println(fmt.Sprintf("Sum = %v, Sum of Powers = %v", sum, powerSums))
 }
 
 func parseLine(line string) (*Game, error) {
@@ -108,6 +110,28 @@ func isGamePossible(game *Game) bool {
 type Game struct {
 	Id       int
 	CubeSets []CubeSet
+}
+
+func (game *Game) power() int {
+	minRed := 0
+	minGreen := 0
+	minBlue := 0
+
+	for _, cubeSet := range game.CubeSets {
+		if cubeSet.Red > minRed {
+			minRed = cubeSet.Red
+		}
+
+		if cubeSet.Green > minGreen {
+			minGreen = cubeSet.Green
+		}
+
+		if cubeSet.Blue > minBlue {
+			minBlue = cubeSet.Blue
+		}
+	}
+
+	return minRed * minGreen * minBlue
 }
 
 type CubeSet struct {
