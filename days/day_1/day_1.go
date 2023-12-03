@@ -1,4 +1,4 @@
-package days
+package day_1
 
 import (
 	"advent-of-code-2023/read_input"

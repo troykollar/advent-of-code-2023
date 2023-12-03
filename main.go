@@ -1,7 +1,8 @@
 package main
 
 import (
-	days "advent-of-code-2023/days/day_1"
+	"advent-of-code-2023/days/day_1"
+	"advent-of-code-2023/days/day_2"
 	"fmt"
 	"os"
 	"strconv"
@@ -21,7 +22,9 @@ func main() {
 
 	switch day {
 	case 1:
-		days.Day1()
+		day_1.Day1()
+	case 2:
+		day_2.Day2()
 	default:
 		panic(fmt.Sprintf("Day %v not yet implemented.", day))
 	}
